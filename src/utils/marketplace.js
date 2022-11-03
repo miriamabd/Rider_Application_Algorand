@@ -54,7 +54,7 @@ export const createCarAction = async (senderAddress, car) => {
     let description = new TextEncoder().encode(car.description);
     let location = new TextEncoder().encode(car.location);
     let price = algosdk.encodeUint64(car.price);
-    let available = algosdk.encodeUint64(car.avaiable);
+    let available = algosdk.encodeUint64(car.available);
 
     let appArgs = [brand, image, description, location, price, available]
 
