@@ -22,6 +22,7 @@ class Car:
     #new car listing
     def application_creation(self):
         return Seq([
+            # checks and ensures that the input data contains only valid and non-empty values
             Assert(
                 And(
                     Txn.application_args.length() == Int(5),
@@ -31,7 +32,7 @@ class Car:
                     Len(Txn.application_args[2]) > Int(0),
                      Len(Txn.application_args[3]) > Int(0),
                     Btoi(Txn.application_args[4]) > Int(0),
-                    Len(Txn.application_args[5]) > Int(0),
+                    Btoi(Txn.application_args[5]) > Int(0),
                 )
             ), 
 
@@ -41,7 +42,7 @@ class Car:
             App.globalPut(self.Variables.description, Txn.application_args[2]),
              App.globalPut(self.Variables.location, Txn.application_args[3]),
             App.globalPut(self.Variables.price, Btoi(Txn.application_args[4])),
-            App.globalPut(self.Variables.available, Txn.application_args[5]),
+            App.globalPut(self.Variables.available, Btoi(Txn.application_args[5])),
             App.globalPut(self.Variables.sold, Int(0)),
 
             Approve(),
@@ -49,17 +50,20 @@ class Car:
 
   #buy car
     def buy(self):
-            count = Txn.application_args[1]
             valid_number_of_transactions = Global.group_size() == Int(2)
-
+            # checks that the payment arguments are valid
             valid_payment_to_seller = And(
                 Gtxn[1].type_enum() == TxnType.Payment,
                 Gtxn[1].receiver() == Global.creator_address(),
                 Gtxn[1].amount() == App.globalGet(self.Variables.price),
                 Gtxn[1].sender() == Gtxn[0].sender(),
             )
-
-            can_buy = And(valid_number_of_transactions,
+            # checks if sender is not the creator
+            # checks to see if stock can fulfill order
+            can_buy = And(
+                        Txn.sender() != Global.creator_address(),
+                        App.globalGet(self.Variables.available) > Int(0),
+                        valid_number_of_transactions,
                         valid_payment_to_seller)
 
             update_state = Seq([
@@ -73,30 +77,37 @@ class Car:
     
   # add more car to the listing
     def addmorecars(self):
+        # checks to ensure that new value for the variable available is valid
+        # checks if the sender is the creator
         Assert(
             And(
                     Txn.sender() == Global.creator_address(),
                     Txn.applications.length() == Int(1),
                     Txn.application_args.length() == Int(2),
+                    Btoi(Txn.application_args[2]) > Int(0)
             ),
         ),
         return Seq([
-            App.globalPut(self.Variables.available, Txn.application_args[2]),
+            App.globalPut(self.Variables.available, Btoi(Txn.application_args[1])),
             Approve()
         ])
 
 
     #change location
     def changelocation(self):
+        
+        # checks to ensure that new value for the variable location is valid
+        # checks if the sender is the creator
         Assert(
             And(
                     Txn.sender() == Global.creator_address(),
                     Txn.applications.length() == Int(1),
                     Txn.application_args.length() == Int(2),
+                    Len(Txn.application_args[1]) > Int(0)
             ),
         ),
         return Seq([
-            App.globalPut(self.Variables.location, Txn.application_args[2]),
+            App.globalPut(self.Variables.location, Txn.application_args[1]),
             Approve()
         ])
 
