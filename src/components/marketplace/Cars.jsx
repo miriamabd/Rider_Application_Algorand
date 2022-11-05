@@ -4,7 +4,7 @@ import AddCar from "./AddCar";
 import Car from "./Car";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {buyCarAction, createCarAction, addcarAction, changelocationAction,  deleteCarAction, getCarsAction,} from "../../utils/marketplace";
+import {buyCarAction, createCarAction, addmoreCarsAction, changelocationAction,  deleteCarAction, getCarsAction,} from "../../utils/marketplace";
 import PropTypes from "prop-types";
 import {Row} from "react-bootstrap";
 
@@ -50,7 +50,7 @@ const Cars = ({address, fetchBalance}) => {
 
     const addCar = async (car, ammount) => {
         setLoading(true);
-        addcarAction(address, car, ammount)
+        addmoreCarsAction(address, car, ammount)
             .then(() => {
                 toast(<NotificationSuccess text="Car added"/>);
                 getCars();

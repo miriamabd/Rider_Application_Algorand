@@ -22,20 +22,33 @@ bnz main_l6
 err
 main_l6:
 byte "LOCATION"
-txna ApplicationArgs 2
+txna ApplicationArgs 1
 app_global_put
 int 1
 return
 main_l7:
-byte "AVAILABLE"
-txna ApplicationArgs 2
+byte "AVAILABLECARS"
+byte "AVAILABLECARS"
+app_global_get
+txna ApplicationArgs 1
+btoi
++
 app_global_put
 int 1
 return
 main_l8:
+txn Sender
+global CreatorAddress
+!=
+byte "AVAILABLECARS"
+app_global_get
+int 0
+>
+&&
 global GroupSize
 int 2
 ==
+&&
 gtxn 1 TypeEnum
 int pay
 ==
@@ -57,14 +70,14 @@ bnz main_l10
 int 0
 return
 main_l10:
-byte "Sold"
-byte "Sold"
+byte "SOLD"
+byte "SOLD"
 app_global_get
 int 1
 +
 app_global_put
-byte "AVAILABLE"
-byte "AVAILABLE"
+byte "AVAILABLECARS"
+byte "AVAILABLECARS"
 app_global_get
 int 1
 -
@@ -78,10 +91,10 @@ global CreatorAddress
 return
 main_l12:
 txn NumAppArgs
-int 5
+int 6
 ==
 txn Note
-byte "rider:uv1"
+byte "rider:uv1.6"
 ==
 &&
 txna ApplicationArgs 0
@@ -110,12 +123,12 @@ int 0
 >
 &&
 txna ApplicationArgs 5
-len
+btoi
 int 0
 >
 &&
 assert
-byte "NAME"
+byte "BRAND"
 txna ApplicationArgs 0
 app_global_put
 byte "IMAGE"
@@ -131,10 +144,11 @@ byte "PRICE"
 txna ApplicationArgs 4
 btoi
 app_global_put
-byte "AVAILABLE"
+byte "AVAILABLECARS"
 txna ApplicationArgs 5
+btoi
 app_global_put
-byte "Sold"
+byte "SOLD"
 int 0
 app_global_put
 int 1

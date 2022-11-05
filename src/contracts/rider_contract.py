@@ -3,13 +3,13 @@ from pyteal import *
 
 class Car:
     class Variables:
-        brand = Bytes("NAME")
+        brand = Bytes("BRAND")
         image = Bytes("IMAGE")
         description = Bytes("DESCRIPTION")
         location = Bytes("LOCATION")
         price = Bytes("PRICE")
-        available = Bytes("AVAILABLE")
-        sold = Bytes("Sold")
+        availableCars = Bytes("AVAILABLECARS")
+        sold = Bytes("SOLD")
        
         
 
@@ -25,12 +25,12 @@ class Car:
             # checks and ensures that the input data contains only valid and non-empty values
             Assert(
                 And(
-                    Txn.application_args.length() == Int(5),
-                    Txn.note() == Bytes("rider:uv1"),
+                    Txn.application_args.length() == Int(6),
+                    Txn.note() == Bytes("rider:uv1.6"),
                     Len(Txn.application_args[0]) > Int(0),
                     Len(Txn.application_args[1]) > Int(0),
                     Len(Txn.application_args[2]) > Int(0),
-                     Len(Txn.application_args[3]) > Int(0),
+                    Len(Txn.application_args[3]) > Int(0),
                     Btoi(Txn.application_args[4]) > Int(0),
                     Btoi(Txn.application_args[5]) > Int(0),
                 )
@@ -40,9 +40,9 @@ class Car:
             App.globalPut(self.Variables.brand, Txn.application_args[0]),
             App.globalPut(self.Variables.image, Txn.application_args[1]),
             App.globalPut(self.Variables.description, Txn.application_args[2]),
-             App.globalPut(self.Variables.location, Txn.application_args[3]),
+            App.globalPut(self.Variables.location, Txn.application_args[3]),
             App.globalPut(self.Variables.price, Btoi(Txn.application_args[4])),
-            App.globalPut(self.Variables.available, Btoi(Txn.application_args[5])),
+            App.globalPut(self.Variables.availableCars, Btoi(Txn.application_args[5])),
             App.globalPut(self.Variables.sold, Int(0)),
 
             Approve(),
@@ -62,13 +62,13 @@ class Car:
             # checks to see if stock can fulfill order
             can_buy = And(
                         Txn.sender() != Global.creator_address(),
-                        App.globalGet(self.Variables.available) > Int(0),
+                        App.globalGet(self.Variables.availableCars) > Int(0),
                         valid_number_of_transactions,
                         valid_payment_to_seller)
 
             update_state = Seq([
                 App.globalPut(self.Variables.sold, App.globalGet(self.Variables.sold) + Int(1)),
-                App.globalPut(self.Variables.available, App.globalGet(self.Variables.available) - Int(1)),
+                App.globalPut(self.Variables.availableCars, App.globalGet(self.Variables.availableCars) - Int(1)),
                 Approve()
             ])
 
@@ -88,7 +88,7 @@ class Car:
             ),
         ),
         return Seq([
-            App.globalPut(self.Variables.available, Btoi(Txn.application_args[1])),
+            App.globalPut(self.Variables.availableCars, App.globalGet(self.Variables.availableCars) + Btoi(Txn.application_args[1])),
             Approve()
         ])
 

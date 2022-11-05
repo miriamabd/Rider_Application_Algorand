@@ -16,13 +16,13 @@ import clearProgram from "!!raw-loader!../contracts/rider_contract_clear.teal";
 import {base64ToUTF8String, utf8ToBase64String} from "./conversions";
 
 class Car {
-    constructor(brand, image, description, location, price, available, sold, appId, owner) {
+    constructor(brand, image, description, location, price, availableCars, sold, appId, owner) {
         this.brand = brand;
         this.image = image;
         this.description = description;
         this.location = location;
         this.price = price;
-        this.available = available;
+        this.availableCars = availableCars;
         this.sold = sold;
         this.appId = appId;
         this.owner = owner;
@@ -54,9 +54,10 @@ export const createCarAction = async (senderAddress, car) => {
     let description = new TextEncoder().encode(car.description);
     let location = new TextEncoder().encode(car.location);
     let price = algosdk.encodeUint64(car.price);
-    let available = algosdk.encodeUint64(car.avaiable);
+    let numbercar = Number(car.availableCars);
+    let availableCars = algosdk.encodeUint64(numbercar);
 
-    let appArgs = [brand, image, description, location, price, available]
+    let appArgs = [brand, image, description, location, price, availableCars]
 
     // Create ApplicationCreateTxn
     let txn = algosdk.makeApplicationCreateTxnFromObject({
@@ -98,14 +99,15 @@ export const createCarAction = async (senderAddress, car) => {
 
   
 // ADDING A NEW CAR: Group transaction consisting of ApplicationCallTxn 
-export const addcarAction = async (senderAddress, car, ammount) => {
+export const addmoreCarsAction = async (senderAddress, car, ammount) => {
     console.log("adding car...");
   
     let params = await algodClient.getTransactionParams().do();
   
     // Build required app args as Uint8Array
     let addcarArg = new TextEncoder().encode("addmorecars");
-    let newammount = algosdk.encodeUint64(ammount);
+    let newammount_ = Number(ammount);
+    let newammount = algosdk.encodeUint64(newammount_);
 
   
     let appArgs = [addcarArg, newammount];
@@ -318,7 +320,7 @@ const getApplication = async (appId) => {
         let description = ""
         let location = ""
         let price = 0
-        let avaiable = 0
+        let avaiableCars = 0
         let sold = 0
 
         const getField = (fieldName, globalState) => {
@@ -351,15 +353,15 @@ const getApplication = async (appId) => {
             price = getField("PRICE", globalState).value.uint
         }
 
-        if (getField("AVAILABLE", globalState) !== undefined) {
-            avaiable = getField("AVAILABLE", globalState).value.uint
+        if (getField("AVAILABLECARS", globalState) !== undefined) {
+            avaiableCars = getField("AVAILABLECARS", globalState).value.uint
         }
 
         if (getField("SOLD", globalState) !== undefined) {
             sold = getField("SOLD", globalState).value.uint
         }
 
-        return new Car(brand, image, description, location, price, avaiable, sold, appId, owner)
+        return new Car(brand, image, description, location, price, avaiableCars, sold, appId, owner)
     } catch (err) {
         return null;
     }
