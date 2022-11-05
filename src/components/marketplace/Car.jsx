@@ -6,9 +6,9 @@ import Identicon from "../utils/Identicon";
 import {stringToMicroAlgos} from "../../utils/conversions";
 
 const Car = ({address, car, buyCar, deleteCar, addCar, changeLocation,}) => {
-    const {brand, image, description, location, price, available, sold, appId, owner} = car;
+    const {brand, image, description, location, price, availableCars, sold, appId, owner} = car;
 
-    const [ammount, setAmmount] = useState(0);
+    const [ammount, setAmmount] = useState("");
     const [newlocation, setNewLocation] = useState("");
    
 
@@ -20,7 +20,7 @@ const Car = ({address, car, buyCar, deleteCar, addCar, changeLocation,}) => {
                         <span className="font-monospace text-secondary">{truncateAddress(owner)}</span>
                         <Identicon size={28} address={owner}/>
                         <Badge bg="secondary" className="ms-auto">
-                            {available} Available
+                            {availableCars} Available
                         </Badge>
 
                         <Badge bg="secondary" className="ms-auto">
@@ -37,7 +37,7 @@ const Car = ({address, car, buyCar, deleteCar, addCar, changeLocation,}) => {
                     <Card.Text className="flex-grow-1"> Location: {location}</Card.Text>
                     <Form className="d-flex align-content-stretch flex-row gap-2">
                        
-                        {car.owner !== address && 
+                        {car.owner !== address && availableCars > 0 ?(
                         <Button
                             variant="outline-dark"
                             onClick={() => buyCar(car)}
@@ -45,6 +45,9 @@ const Car = ({address, car, buyCar, deleteCar, addCar, changeLocation,}) => {
                         >
                             Buy for {microAlgosToString(price)} ALGO
                         </Button>
+                        ):(
+                            <Card.Text className="flex-grow-1">{car.owner!== address? "SOLD OUT": ""}</Card.Text>
+                        )
                         }
                         {car.owner === address &&
                             <Button
@@ -65,13 +68,13 @@ const Car = ({address, car, buyCar, deleteCar, addCar, changeLocation,}) => {
                     <FloatingLabel
                             controlId="inputAmmount"
                             label="ammount"
-                            className="mb-3"
+                            className="mb-3 mt-4"
                         >
                             <Form.Control
                                 type="text"
                                 placeholder="Ammount"
                                 onChange={(e) => {
-                                    setAmmount(e.target.value);
+                                    setAmmount(Number(e.target.value));
                                 }}
                             />
                         </FloatingLabel>
@@ -92,7 +95,7 @@ const Car = ({address, car, buyCar, deleteCar, addCar, changeLocation,}) => {
                                  <FloatingLabel
                             controlId="inputLOCATION"
                             label="location"
-                            className="mb-3"
+                            className="mb-3 mt-4"
                         >
                             <Form.Control
                                 type="text"

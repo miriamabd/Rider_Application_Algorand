@@ -9,11 +9,11 @@ const AddCar = ({createCar}) => {
     const [description, setDescription] = useState("");
     const [location, setLocation] = useState("");
     const [price, setPrice] = useState(0);
-    const [available, setAvailable] = useState(0);
+    const [availableCars, setAvailableCars] = useState(1);
 
     const isFormFilled = useCallback(() => {
-        return brand && image && description && location && price && available > 0
-    }, [brand, image, description, location, price, available]);
+        return brand && image && description && location && price && availableCars > 0
+    }, [brand, image, description, location, price, availableCars]);
 
     const [show, setShow] = useState(false);
 
@@ -111,10 +111,11 @@ const AddCar = ({createCar}) => {
                             className="mb-3"
                         >
                             <Form.Control
-                                type="text"
+                                type="number"
+                                value={availableCars}
                                 placeholder="Available cars"
                                 onChange={(e) => {
-                                    setAvailable(e.target.value);
+                                    setAvailableCars(Number(e.target.value));
                                 }}
                             />
                         </FloatingLabel>
@@ -134,7 +135,7 @@ const AddCar = ({createCar}) => {
                                 description,
                                 location,
                                 price,
-                                available,
+                                availableCars,
                             });
                             handleClose();
                         }}
